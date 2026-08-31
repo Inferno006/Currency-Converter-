@@ -1,122 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A premium and precise currency converter with real-time exchange rates, 4-decimal precision, conversion history, and elegant dark glassmorphism design.">
-  <meta name="keywords" content="currency converter, exchange rates, precise conversion, glassmorphism, usd, eur, inr, gbp">
-  <title>Currency Converter | Precise & Elegant Real-Time Exchange Rates</title>
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <title>Currency Converter & Rate Analytics</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
-  <!-- Premium Animated Background Globs -->
-  <div class="bg-glow blob-1"></div>
-  <div class="bg-glow blob-2"></div>
-  <div class="bg-glow blob-3"></div>
-
-  <!-- Main glassmorphism card container -->
-  <div class="converter-card animate-fade-in">
-    <div class="card-header">
-      <div class="icon-badge">
-        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="12" y1="1" x2="12" y2="23"></line>
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-        </svg>
+  <div class="app-container">
+    <header>
+      <div class="header-top">
+        <h1>Currency Converter</h1>
+        <button id="themeToggleBtn" class="theme-toggle-btn" aria-label="Toggle Theme">
+          <span id="themeIcon">☀️</span>
+        </button>
       </div>
-      <h2>Currency Converter</h2>
-      <p class="subtitle">Convert currencies with 4-decimal precision</p>
-    </div>
-    
-    <!-- Amount Input Group -->
-    <div class="input-group">
-      <label for="amount">Amount to Convert</label>
-      <div class="input-wrapper">
-        <span class="input-prefix" id="amount-prefix">$</span>
-        <input type="number" id="amount" value="100.00" min="0.0001" step="any" placeholder="0.0000">
+      <p>Real-time exchange rates, market trends & conversion history</p>
+    </header>
+
+    <main class="grid-layout">
+      <!-- Left Column: Converter & Recent Conversions -->
+      <div class="left-column">
+        <section class="card converter-card">
+          <h2>Convert Currency</h2>
+          
+          <div id="errorMessage" class="error-banner hidden"></div>
+
+          <div class="input-group">
+            <label for="amount">Amount</label>
+            <div class="input-wrapper">
+              <span id="amountPrefix" class="prefix">$</span>
+              <input type="number" id="amount" value="100" min="0.01" step="any">
+            </div>
+          </div>
+
+          <div class="currency-selectors">
+            <div class="select-group">
+              <label for="fromCurrency">From</label>
+              <select id="fromCurrency">
+                <option value="USD" selected>USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+                <option value="INR">INR - Indian Rupee</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="JPY">JPY - Japanese Yen</option>
+                <option value="AUD">AUD - Australian Dollar</option>
+                <option value="CAD">CAD - Canadian Dollar</option>
+                <option value="CHF">CHF - Swiss Franc</option>
+              </select>
+            </div>
+
+            <button id="swapBtn" class="icon-btn" title="Swap Currencies">⇄</button>
+
+            <div class="select-group">
+              <label for="toCurrency">To</label>
+              <select id="toCurrency">
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR" selected>EUR - Euro</option>
+                <option value="INR">INR - Indian Rupee</option>
+                <option value="GBP">GBP - British Pound</option>
+                <option value="JPY">JPY - Japanese Yen</option>
+                <option value="AUD">AUD - Australian Dollar</option>
+                <option value="CAD">CAD - Canadian Dollar</option>
+                <option value="CHF">CHF - Swiss Franc</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="convertBtn" class="primary-btn">Convert</button>
+
+          <div class="result-display">
+            <span id="resultText" class="result-text">--</span>
+            <span id="lastUpdated" class="timestamp">Last updated: --</span>
+          </div>
+        </section>
+
+        <!-- Recent Conversions Card (Moved below converter) -->
+        <section class="card history-card">
+          <div class="history-header">
+            <h2>Recent Conversions</h2>
+            <button id="clearHistoryBtn" class="clear-btn">Clear</button>
+          </div>
+          <ul id="historyList" class="history-list"></ul>
+        </section>
       </div>
-    </div>
 
-    <!-- Currency Selection Row -->
-    <div class="currency-row">
-      <div class="select-group">
-        <label for="from-currency">From</label>
-        <div class="select-wrapper">
-          <select id="from-currency">
-            <option value="USD" selected>USD 🇺🇸</option>
-            <option value="EUR">EUR 🇪🇺</option>
-            <option value="INR">INR 🇮🇳</option>
-            <option value="GBP">GBP 🇬🇧</option>
-            <option value="JPY">JPY 🇯🇵</option>
-            <option value="AUD">AUD 🇦🇺</option>
-            <option value="CAD">CAD 🇨🇦</option>
-            <option value="CHF">CHF 🇨🇭</option>
-            <option value="CNY">CNY 🇨🇳</option>
-            <option value="SGD">SGD 🇸🇬</option>
-            <option value="AED">AED 🇦🇪</option>
-            <option value="NZD">NZD 🇳🇿</option>
-          </select>
-        </div>
+      <!-- Right Column: Exchange Rate Analytics -->
+      <div class="right-column">
+        <section class="card chart-card">
+          <div class="chart-header">
+            <div>
+              <h2>Exchange Rate Analytics</h2>
+              <span id="chartLabel" class="chart-subtitle">7-Day Trend</span>
+            </div>
+            <div class="timeframe-selector" id="timeframeSelector">
+              <button class="timeframe-btn active" data-tf="7D">7D</button>
+              <button class="timeframe-btn" data-tf="30D">30D</button>
+              <button class="timeframe-btn" data-tf="6M">6M</button>
+              <button class="timeframe-btn" data-tf="1Y">1Y</button>
+              <button class="timeframe-btn" data-tf="10Y">10Y</button>
+            </div>
+          </div>
+
+          <div class="chart-wrapper">
+            <canvas id="rateChart"></canvas>
+          </div>
+
+          <!-- Summary Statistics Grid -->
+          <div class="chart-stats" id="chartStats">
+            <div class="stat-box">
+              <span class="stat-label">High</span>
+              <span class="stat-value" id="statHigh">--</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Low</span>
+              <span class="stat-value" id="statLow">--</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Average</span>
+              <span class="stat-value" id="statAvg">--</span>
+            </div>
+          </div>
+        </section>
       </div>
-
-      <!-- Designer SVG Swap Button -->
-      <button id="swap-btn" title="Swap Currencies">
-        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 17H3M3 17L7 21M3 17L7 13M7 7H21M21 7L17 3M21 7L17 11"/>
-        </svg>
-      </button>
-
-      <div class="select-group">
-        <label for="to-currency">To</label>
-        <div class="select-wrapper">
-          <select id="to-currency">
-            <option value="USD">USD 🇺🇸</option>
-            <option value="EUR">EUR 🇪🇺</option>
-            <option value="INR" selected>INR 🇮🇳</option>
-            <option value="GBP">GBP 🇬🇧</option>
-            <option value="JPY">JPY 🇯🇵</option>
-            <option value="AUD">AUD 🇦🇺</option>
-            <option value="CAD">CAD 🇨🇦</option>
-            <option value="CHF">CHF 🇨🇭</option>
-            <option value="CNY">CNY 🇨🇳</option>
-            <option value="SGD">SGD 🇸🇬</option>
-            <option value="AED">AED 🇦🇪</option>
-            <option value="NZD">NZD 🇳🇿</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <!-- Convert Action Button -->
-    <button id="convert-btn">
-      <span>Convert</span>
-    </button>
-
-    <!-- Results Display Section -->
-    <div class="result-box">
-      <p id="result-text">100.0000 USD = 8,700.0000 INR</p>
-      <p id="last-updated">Last updated: --</p>
-    </div>
-    
-    <!-- Error Display Message -->
-    <div id="error-message" class="hidden"></div>
-
-    <!-- Conversion History Section -->
-    <div class="history-section">
-      <div class="history-header">
-        <h3>Recent Conversions</h3>
-        <button id="clear-history-btn" class="text-btn">Clear History</button>
-      </div>
-      <ul id="history-list" class="history-list">
-        <!-- Dynamic history items rendered via JavaScript -->
-      </ul>
-    </div>
+    </main>
   </div>
 
   <script src="script.js"></script>
